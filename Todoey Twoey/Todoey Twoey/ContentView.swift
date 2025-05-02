@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  Todoey Twoey
-//
-//  Created by Brenton on 4/10/25.
-//
-
 import SwiftUI
 
 struct ContentView: View {
@@ -14,8 +7,15 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section {
+                // CREATE A TASK section
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("CREATE A TASK")
+                        .font(.caption)
+                        .bold()
+                        .foregroundColor(.gray)
+                    
                     TextField("Title", text: $newTodoTitle)
+                        .textFieldStyle(.roundedBorder)
                         .onSubmit {
                             Task {
                                 await vm.createTodo(title: newTodoTitle)
@@ -23,15 +23,21 @@ struct ContentView: View {
                             }
                         }
                 }
+                .padding(.vertical, 4)
                 
-                switch vm.state {
-                case .idle: Text("Make a request")
-                case .loading: Text("Loading...")
-                case .success(let todos): todoListView(todos: todos)
-                case .error(let message): Text("Error: \(message)")
-                }
+                // TO-DO Header
+                Text("TO-DO")
+                    .font(.caption)
+                    .bold()
+                    .foregroundColor(.gray)
+                    .padding(.top)
+
+                // TO-DO List Items
+                todoListSection()
             }
-            .navigationTitle("Todoey Twoey")
+            .listStyle(.plain)
+            .navigationTitle("Todoey")
+            .navigationBarTitleDisplayMode(.inline)
             .refreshable {
                 await vm.fetchTodos()
             }
@@ -40,32 +46,42 @@ struct ContentView: View {
             await vm.fetchTodos()
         }
     }
-    
+
     @ViewBuilder
-    private func todoListView(todos: [Todo]) -> some View {
-        ForEach(todos) { todo in
-            Button {
-                Task {
-                    await vm.toggleCompletion(for: todo)
-                }
-            } label: {
-                Label(todo.title, systemImage: todo.isCompleted ? "circle.fill" : "circle")
-            }
-            .swipeActions {
-                Button(role: .destructive) {
+    private func todoListSection() -> some View {
+        switch vm.state {
+        case .idle:
+            Text("Make a request")
+        case .loading:
+            Text("Loading...")
+        case .success(let todos):
+            ForEach(todos) { todo in
+                Button {
                     Task {
-                        await vm.delete(todo: todo)
+                        await vm.toggleCompletion(for: todo)
                     }
                 } label: {
-                    Image(systemName: "trash")
+                    Label(todo.title, systemImage: todo.completed ? "circle.fill" : "circle")
+                        .labelStyle(.titleAndIcon)
+                        .foregroundColor(.primary)
                 }
-                .tint(.red)
+                .swipeActions {
+                    Button(role: .destructive) {
+                        Task {
+                            await vm.delete(todo: todo)
+                        }
+                    } label: {
+                        Image(systemName: "trash")
+                    }
+                    .tint(.red)
+                }
             }
+        case .error(let message):
+            Text("Error: \(message)")
         }
     }
 }
 
-
-#Preview {
+#Preview{
     ContentView()
 }
