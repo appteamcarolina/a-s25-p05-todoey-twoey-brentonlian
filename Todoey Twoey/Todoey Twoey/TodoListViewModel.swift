@@ -56,7 +56,7 @@ class TodoListViewModel: ObservableObject {
     func toggleCompletion(for todo: Todo) async {
                 // TODO: Implement toggleCompletion
         do {
-                    try await TodoListService.updateCompletion(for: todo, isCompleted: !todo.completed)
+                    try await TodoListService.updateCompletion(for: todo, isCompleted: !todo.isCompleted)
                     await fetchTodos() // Refresh list after update
                 } catch {
                     state = .error("Failed to update completion: \(error.localizedDescription)")

@@ -6,45 +6,47 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            List {
-                // CREATE A TASK section
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("CREATE A TASK")
-                        .font(.caption)
-                        .bold()
-                        .foregroundColor(.gray)
-                    
-                    TextField("Title", text: $newTodoTitle)
-                        .textFieldStyle(.roundedBorder)
-                        .onSubmit {
-                            Task {
-                                await vm.createTodo(title: newTodoTitle)
-                                newTodoTitle = ""
+                    List {
+                        // CREATE A TASK section
+                        Section {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("CREATE A TASK")
+                                    .font(.caption)
+                                    .bold()
+                                    .foregroundColor(.gray)
+                                
+                                TextField("Title", text: $newTodoTitle)
+                                    .textFieldStyle(.roundedBorder)
+                                    .onSubmit {
+                                        Task {
+                                            await vm.createTodo(title: newTodoTitle)
+                                            newTodoTitle = ""
+                                        }
+                                    }
                             }
+                            .padding(.vertical, 4)
                         }
+                        
+                        // TO-DO section
+                        Section(header:
+                            Text("TO-DO")
+                                .font(.caption)
+                                .bold()
+                                .foregroundColor(.gray)
+                        ) {
+                            todoListSection()
+                        }
+                    }
+                    .listStyle(.insetGrouped) // Optional: more modern styling
+                    .navigationTitle("Todoey")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .refreshable {
+                        await vm.fetchTodos()
+                    }
                 }
-                .padding(.vertical, 4)
-                
-                // TO-DO Header
-                Text("TO-DO")
-                    .font(.caption)
-                    .bold()
-                    .foregroundColor(.gray)
-                    .padding(.top)
-
-                // TO-DO List Items
-                todoListSection()
-            }
-            .listStyle(.plain)
-            .navigationTitle("Todoey")
-            .navigationBarTitleDisplayMode(.inline)
-            .refreshable {
-                await vm.fetchTodos()
-            }
-        }
-        .task {
-            await vm.fetchTodos()
-        }
+                .task {
+                    await vm.fetchTodos()
+                }
     }
 
     @ViewBuilder
@@ -61,7 +63,7 @@ struct ContentView: View {
                         await vm.toggleCompletion(for: todo)
                     }
                 } label: {
-                    Label(todo.title, systemImage: todo.completed ? "circle.fill" : "circle")
+                    Label(todo.title, systemImage: todo.isCompleted ? "circle.fill" : "circle")
                         .labelStyle(.titleAndIcon)
                         .foregroundColor(.primary)
                 }

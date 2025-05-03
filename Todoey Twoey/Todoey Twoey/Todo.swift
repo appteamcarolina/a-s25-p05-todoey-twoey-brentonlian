@@ -14,5 +14,5 @@ struct NewTodo: Codable {
 struct Todo: Identifiable, Codable {
     let id: UUID
     let title: String
-    var completed: Bool
+    var isCompleted: Bool
 }
