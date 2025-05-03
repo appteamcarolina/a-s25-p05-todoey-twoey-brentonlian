@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct TodoListService {
+enum TodoListService {
     static let decoder = JSONDecoder()
     static let encoder = JSONEncoder()
     
@@ -50,7 +50,6 @@ struct TodoListService {
     
     static func updateCompletion(for todo: Todo, isCompleted: Bool) async throws {
         // TODO: Implement
-        // Construct correct URL with query parameter
         guard let url = URL(string: "\(baseUrl)/\(todo.id.uuidString)/updateCompleted?isCompleted=\(isCompleted)") else {
             throw URLError(.badURL)
         }
@@ -58,7 +57,6 @@ struct TodoListService {
         var request = URLRequest(url: url)
         request.httpMethod = "PATCH"
         
-        // No body needed
         _ = try await URLSession.shared.data(for: request)
     }
 }

@@ -8,18 +8,18 @@
 import Foundation
 
 enum TodoListLoadingState {
-        // TODO: Implement TodoListLoadingState
-        // with success, error, loading, and idle states
-        case idle
-        case loading
-        case success([Todo])
-        case error(String)
+    // TODO: Implement TodoListLoadingState
+    // with success, error, loading, and idle states
+    case idle
+    case loading
+    case success([Todo])
+    case error(String)
 }
 
 @MainActor
 class TodoListViewModel: ObservableObject {
     @Published var state: TodoListLoadingState = .idle
-    
+
     func fetchTodos() async {
         state = .loading
         do {
@@ -33,34 +33,33 @@ class TodoListViewModel: ObservableObject {
     }
 
     func createTodo(title: String) async {
-                // TODO: Implement createTodo using TodoListService.create() (see fetchTodos)
+        // TODO: Implement createTodo using TodoListService.create() (see fetchTodos)
         guard !title.isEmpty else { return }
-                do {
-                    _ = try await TodoListService.create(newTodo: NewTodo(title: title))
-                    await fetchTodos()
-                } catch {
-                    state = .error("Failed to create todo: \(error.localizedDescription)")
-                }
+        do {
+            _ = try await TodoListService.create(newTodo: NewTodo(title: title))
+            await fetchTodos()
+        } catch {
+            state = .error("Failed to create todo: \(error.localizedDescription)")
+        }
     }
 
     func delete(todo: Todo) async {
-                // TODO: Implement delete
+        // TODO: Implement delete
         do {
-                    try await TodoListService.delete(todo: todo)
-                    await fetchTodos()
-                } catch {
-                    state = .error("Failed to delete todo: \(error.localizedDescription)")
-                }
+            try await TodoListService.delete(todo: todo)
+            await fetchTodos()
+        } catch {
+            state = .error("Failed to delete todo: \(error.localizedDescription)")
+        }
     }
 
     func toggleCompletion(for todo: Todo) async {
-                // TODO: Implement toggleCompletion
+        // TODO: Implement toggleCompletion
         do {
-                    try await TodoListService.updateCompletion(for: todo, isCompleted: !todo.isCompleted)
-                    await fetchTodos() // Refresh list after update
-                } catch {
-                    state = .error("Failed to update completion: \(error.localizedDescription)")
-                }
-            }
+            try await TodoListService.updateCompletion(for: todo, isCompleted: !todo.isCompleted)
+            await fetchTodos() // Refresh list after update
+        } catch {
+            state = .error("Failed to update completion: \(error.localizedDescription)")
+        }
     }
-
+}
